@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<style>
+	.img-responsive {
+		margin: 0 auto;
+	}
+	.img-wrap{
+		padding: 50px 0;
+	}
+	.blocos{
+		height: 300px;
+	}
+	.bg-pink{
+		background-color: #b622b5;
+	}
+	.bg-blue{
+		background-color: #3350b9;
+	}
+	.bg-lightblue{
+		background-color: #0097f6;
+	}
+</style>
+<body>	
+
+
+
+	<script src="http://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+	<script type="text/javascript">
+		$(window).on('load', ()=>{
+			$('img').attr('alt','alt de teste');
+		});
+
+		$.ajax({
+		    url: 'https://flickrdidenkoradionv1.p.rapidapi.com/getListPhoto',
+		    dataType: 'json',
+		    beforeSend: function () {
+		        console.log('aguarde...');
+		    },
+		    success: function (data) {
+		        console.log(data);
+		    },
+		    error: function (xhr, er) {
+		        console.log('Algo inesperado aconteceu. Tente novamente');
+		    }
+		});
+	</script>	
+
+</body>
+
+</html>
