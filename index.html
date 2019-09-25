@@ -3,56 +3,127 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 <style>
-	.img-responsive {
-		margin: 0 auto;
-	}
-	.img-wrap{
-		padding: 50px 0;
-	}
-	.blocos{
+	.caption{
 		height: 300px;
 	}
-	.bg-pink{
-		background-color: #b622b5;
+	.shadow{
+		box-shadow: 2px 2px 5px #c5c5c5;
 	}
-	.bg-blue{
-		background-color: #3350b9;
+	.bg-secondary{
+		background-color: #f1f1f1;
 	}
-	.bg-lightblue{
-		background-color: #0097f6;
+	.bg-dark{
+		background-color: #424242;
 	}
+	.mt-20{
+		margin-top: 20px; 
+	}
+	p{
+		word-wrap: break-word;
+	}
+
 </style>
 <body>	
-	teste
+	<div class="container-fluid">
+		<div class="row bg-dark shadow">
+			<div class="col-sm-6 col-sm-offset-3 mt-20" style="padding: 10px">
+				<div class="input-group">
+					<!-- BARRA DE PESQUISA -->
+			      	<input type="text" class="form-control" id="inpt_search" placeholder="Procurar">
+			      	<div id="search" class="input-group-addon btn btn-primary bg-primary"><i class="glyphicon glyphicon-search"></i></div>
+			    </div>
+			</div>
+		</div>
+		<!-- ARMAZAENA O CONTEÚDO/AS IMAGENS -->
+		<div id="conteudo" class="row">
+		</div>
+	</div>
 
 
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 	<script type="text/javascript">
+		// BUSCA IMAGENS RELACIONADAS COM WORK AO CARREGAR A PÁGINA
 		$(window).on('load', ()=>{
-			$('img').attr('alt','alt de teste');
+			 search_img('work');
 		});
 
-		$.ajax({
-			async: true,
-			crossDomain: true,
-			url: "https://flickrdidenkoradionv1.p.rapidapi.com/getListPhoto",
-			method: "POST",
-			headers: {
-				"x-rapidapi-host": "FlickrdidenkoradionV1.p.rapidapi.com",
-				"x-rapidapi-key": "d553591a4bmsh5649d1395567cdcp1c52acjsnb260d061e3f1",
-				"content-type": "application/x-www-form-urlencoded"
-			},
-		    dataType: 'json',
-		    beforeSend: function () {
-		        console.log('aguarde...');
-		    },
-		    success: function (data) {
-		        console.log(data);
-		    },
-		    error: function (xhr, er) {
-		        console.log('Algo inesperado aconteceu. Tente novamente');
-		    }
+		// REALIZA BUSCA DAS IMAGENS AO DIGITAR
+		$('#inpt_search').keyup(()=>{
+			search_img($('#inpt_search').val());
 		});
+
+		// REALIZA BUSCA DAS IMAGENS AO CLICAR NO BOTÃO DE PESQUISAR
+		$('#search').click(()=>{
+			search_img($('#inpt_search').val());
+		});
+
+		// FUNÇÃO QUE BUSCA AS IMAGENS E PREENCHE O #CONTEUDO
+		function search_img(value){
+			// SE O PARAMETRO FOR VAZIO É ATRIBUIDO A PALAVRA WORK
+			if((value == null)||(value == '')){
+				value = 'work';
+			}
+			// CRIA A LINK PARA BUSCA NA API
+			var link = 'https://pixabay.com/api/?key=13735027-6d6d3243088daa2f6194339b5&q='+value+'&image_type=photo';
+			$.ajax({
+			    url: link,
+			    dataType: 'json',
+			    beforeSend: function () {
+			        console.log('aguarde...');
+			    },
+			    success: function (data) {
+			        if(data.totalHits == 0){
+						$('#conteudo').html("");//LIMPA O CONTEÚDO
+			        	$('#conteudo').append(''
+			        		+'<div class="col-md-6 col-md-offset-3 mt-20">'
+					        	+'<div class="thumbnail shadow">'
+							      	+'<h2>Nada Encontrado!</h2>'
+							      	+'<div class="caption bg-secondary">'
+									    +'<p>Nenhuma imagem foi encontrada. Tente novamente!</p>'
+									+'</div>'
+						    	+'</div>'
+					    	+'</div>'
+			        	+'');
+			        }else{
+
+			        	var end = 5;
+			        	// VERIFICA SE O RETORNO É MENOR QUE 6 POSIÇÕES
+			        	if(data.totalHits < 5){
+			        		end = data.totalHits - 1;
+			        	}
+			        	$('#conteudo').html("");
+			        	for(n = 0; n <= end; n++){
+				        	$('#conteudo').append(''
+				        		+'<div class="col-md-4 col-sm-6 mt-20">'
+						        	+'<div class="thumbnail shadow">'
+								      	+'<h2>Imagem '+(n+1)+'</h2>'
+								      	+'<div class="caption bg-secondary">'
+										    +'<h3>Tags: '+data.hits[n].tags+'</h3>'
+										    +'<p>link: <a target="_blank" href="'+data.hits[n].largeImageURL+'">'+data.hits[n].largeImageURL+'</a></p>'
+										    +'<p><a href="#" class="btn btn-primary" role="button">Button</a></p>'
+										+'</div>'
+							    	+'</div>'
+						    	+'</div>'
+				        	+'');
+			        	}			        
+			        }
+			        
+			    },
+			    error: function (xhr, er) {
+			        $('#conteudo').append(''
+		        		+'<div class="col-md-6 col-md-offset-3 mt-20">'
+				        	+'<div class="thumbnail shadow">'
+						      	+'<h2>Erro Inesperado!</h2>'
+						      	+'<div class="caption bg-secondary">'
+								    +'<p>Algo de errado aconteceu. Tente novamente mais tarde!</p>'
+								+'</div>'
+					    	+'</div>'
+				    	+'</div>'
+			        +'');
+			    }
+			});
+		}
+		
 	</script>	
 
 </body>
